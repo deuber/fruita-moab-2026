@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fruita &amp; Moab 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column of trip notes, with wider breakouts for ride cards and the day plan */
+:root {
+  --bg: #f4f4f0;
+  --surface: #ffffff;
+  --fg: #1d221f;
+  --muted: #5d665f;
+  --line: #dcdfd8;
+  --accent: #2f6b55;       /* juniper */
+  --accent-soft: #e0eee7;
+  --flag: #a8620a;         /* desert varnish amber */
+  --flag-soft: #f8ecd8;
+  --easy: #2e8b4e;
+  --mod: #1f62b8;
+  --hard: #1d221f;
+  --code-bg: #eaece6;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121513; --surface: #1a1f1c; --fg: #e5e9e4; --muted: #9ba59d; --line: #2c3430;
+    --accent: #6fc39f; --accent-soft: #1b3329; --flag: #eeb45c; --flag-soft: #3a2b14;
+    --easy: #5fcf85; --mod: #6ea6f0; --hard: #e5e9e4; --code-bg: #20262273; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121513; --surface: #1a1f1c; --fg: #e5e9e4; --muted: #9ba59d; --line: #2c3430;
+  --accent: #6fc39f; --accent-soft: #1b3329; --flag: #eeb45c; --flag-soft: #3a2b14;
+  --easy: #5fcf85; --mod: #6ea6f0; --hard: #e5e9e4; --code-bg: #20262273; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16.5px; line-height: 1.62; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); padding-block: 56px 80px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(2.2rem, 5.5vw, 3.6rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 1.1rem; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+[id] { scroll-margin-top: 64px; }
+.toc { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 6px 14px; overflow-x: auto; white-space: nowrap; scrollbar-width: none; padding: 12px 0; margin-top: 8px; background: var(--bg); border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 0.8rem; }
+.toc::-webkit-scrollbar { display: none; }
+.toc a { text-decoration: none; padding: 4px 2px; }
+.toc a:hover { text-decoration: underline; }
+.toc .top { margin-left: auto; color: var(--muted); }
+section { display: grid; gap: 18px; padding-block: 44px; border-top: 1px solid var(--line); }
+header { display: grid; gap: 20px; padding-bottom: 40px; }
+.lede { font-size: 1.2rem; max-width: 680px; }
+.tbl-wrap { overflow-x: auto; }
+.money { border-collapse: collapse; width: 100%; max-width: 680px; font-size: 0.92rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+.money th, .money td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.money th { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.money .n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.money tr.sub td { font-weight: 600; background: var(--accent-soft); }
+.money tr.aside td { color: var(--muted); }
+.money tr:last-child td { border-bottom: 0; }
+.prose { max-width: 680px; display: grid; gap: 12px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--mono); font-size: 0.85rem; color: var(--muted); }
+.callout { border-left: 3px solid var(--flag); padding: 4px 0 4px 18px; max-width: 680px; }
+
+/* Trip figures */
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.fact { background: var(--surface); padding: 18px; display: grid; gap: 4px; align-content: start; }
+.fact b { font-family: var(--display); font-size: 1.9rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+.fact span { font-size: 0.9rem; color: var(--muted); }
+
+/* Difficulty marks, using trail-sign shapes */
+.diff { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.diff i { font-style: normal; font-size: 0.95rem; line-height: 1; }
+.diff.easy i { color: var(--easy); }
+.diff.moderate i { color: var(--mod); }
+.diff.hard i, .diff.expert i { color: var(--hard); }
+.legend { display: flex; flex-wrap: wrap; gap: 10px 22px; color: var(--muted); }
+
+/* Filter */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.filters button { font: 500 0.85rem var(--body); color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.filters button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+/* Ride cards */
+.area { display: grid; gap: 12px; }
+.area > h3 { font-family: var(--mono); font-weight: 500; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); padding-top: 10px; }
+.ride { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 20px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 14px 24px; }
+.ride .head { display: grid; gap: 8px; align-content: start; }
+.ride .head h4 { font-family: var(--display); font-size: 1.08rem; margin: 0; line-height: 1.2; text-wrap: balance; }
+.ride .badges { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.tag { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+.tag.shuttle { background: var(--flag-soft); color: var(--flag); }
+.tag.new { background: var(--code-bg); color: var(--muted); }
+.ride .body { display: grid; gap: 10px; min-width: 0; }
+.stats { display: flex; flex-wrap: wrap; gap: 4px 22px; font-family: var(--mono); font-size: 0.86rem; font-variant-numeric: tabular-nums; }
+.stats span { color: var(--muted); }
+.stats b { color: var(--fg); font-weight: 500; }
+.ride .note { font-size: 0.95rem; }
+.ride .link { font-size: 0.88rem; }
+.eb { justify-self: start; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; white-space: nowrap; border: 1px solid currentColor; }
+.eb.yes { color: var(--easy); }
+.eb.no { color: var(--flag); }
+.eb.check { color: var(--muted); border-style: dashed; }
+.budget { height: 6px; max-width: 320px; background: var(--line); border-radius: 3px; overflow: hidden; margin-top: 8px; }
+.budget span { display: block; height: 100%; width: var(--pct); background: var(--accent); }
+.slot .ride-time { font-family: var(--mono); font-size: 0.78rem; color: var(--accent); margin: 2px 0 6px; font-variant-numeric: tabular-nums; }
+.slot .bnote { font-family: var(--mono); font-size: 0.78rem; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.private { font-size: 0.9rem; background: var(--flag-soft); color: var(--fg); border-radius: 4px; padding: 8px 12px; }
+.private b { color: var(--flag); }
+.ride .caution { font-size: 0.9rem; background: var(--flag-soft); border-radius: 4px; padding: 6px 10px; }
+@media (max-width: 640px) { .ride { grid-template-columns: 1fr; } }
+
+/* Day plan */
+.days { display: grid; gap: 0; }
+.slot { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 18px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.slot .d { font-family: var(--mono); font-size: 0.86rem; color: var(--accent); padding-top: 2px; }
+.slot.travel .d { color: var(--flag); }
+.slot h3 { font-size: 1rem; }
+.slot p { font-size: 0.93rem; color: var(--muted); }
+
+/* Checklists */
+.layers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.layer { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 18px; display: grid; gap: 10px; align-content: start; }
+.layer h3 { font-size: 1rem; }
+.layer ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; font-size: 0.92rem; }
+
+ol.questions { margin: 0; padding-left: 1.4em; display: grid; gap: 12px; max-width: 680px; }
+ol.questions li::marker { font-family: var(--mono); color: var(--accent); }
+
+footer { border-top: 1px solid var(--line); padding-top: 28px; display: grid; gap: 10px; font-size: 0.88rem; color: var(--muted); }
+footer ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }
+@media (prefers-reduced-motion: no-preference) { a, .filters button { transition: color .15s, background .15s; } }
+</style>
+</head>
+<body>
+<div class="wrap" id="top">
+
+<header>
+  <div class="eyebrow">Completed trip · Mountain bike trip · Western Colorado &amp; Eastern Utah</div>
+  <h1>Fruita &amp; Moab 2026</h1>
+  <p class="lede">Five riding days in two desert riding towns, and the plan changed along the way. David picked up Adam in Grand Junction on the night of the 23rd, and rain reshuffled the Fruita days: Kokopelli on Saturday, then 18 Road on Sunday. Adam flew home Monday, so David drove to Moab and rode Klondike Bluffs solo. John joined for the last two days: the shuttle-assisted descent David now counts among his top 3 downhill runs of all time, Slickrock, a sunset hike to Delicate Arch, and a final ride at Bar M. Then John drove east and David drove west, home.</p>
+  <div class="meta">
+    <span>David Deuber, with Adam (Fruita) and John (Moab)</span>
+    <span>Fri Oct 23 – Wed Oct 28, 2026</span>
+    <span>Grand Junction → Fruita → Moab → home</span>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <span class="eyebrow">Jump to</span>
+  <a href="#style">Ride style</a>
+  <a href="#ebike">E-bike plan</a>
+  <a href="#list">Ride list</a>
+  <a href="#trails">Rides</a>
+  <a href="#closed">Closed trails</a>
+  <a href="#plan">What we rode</a>
+  <a href="#conditions">Conditions</a>
+  <a href="#lodging">Lodging</a>
+  <a href="#logistics">Logistics</a>
+  <a href="#playlist">Playlist</a>
+  <a href="#sources">Sources</a>
+  <a href="#top" class="top">↑ Top</a>
+</nav>
+
+<section id="style">
+  <div class="eyebrow">How we ride</div>
+  <h2>Ride style</h2>
+  <div class="prose">
+    <p>Both of us are advanced riders. Anything in Truckee is fair game, but we aren't Northstar jumpers or speed demons. The plan goes after technical, flowy, scenic riding and stays away from exposure and high-consequence features.</p>
+  </div>
+  <div class="layers">
+    <div class="layer"><span class="tag">In</span><h3>What we're after</h3><ul><li>Technical climbs and rock moves</li><li>Long, flowy singletrack</li><li>Big views from the trail, not from a cliff edge</li></ul></div>
+    <div class="layer"><span class="tag shuttle">Out</span><h3>What we're skipping</h3><ul><li>Rim riding with fall exposure</li><li>Double-black drop lines</li><li>Big jumps and race-pace descents</li><li>Anything we'd walk anyway: walk it</li></ul></div>
+  </div>
+</section>
+
+<section id="ebike">
+  <div class="eyebrow">Bikes</div>
+  <h2>E-bike plan</h2>
+  <div class="prose">
+    <p>David rides a Class 1 Specialized Levo SL with two range extenders: about 4,000 ft of climbing at 70% assist. No day in the plan climbs more than about 2,400 ft, so there's room to spare. Adam rides a borrowed Specialized Levo Gen 3 (see below). It has to be Class 1 too, like every Levo sold in the US.</p>
+    <p><b>Update: Adam has a bike.</b> He's borrowing a Specialized Levo Gen 3 from Scott, a close friend, so there's no need to rent an e-bike at $140–170 a day. It's a size medium; we checked that the saddle goes high enough for Adam with the post extended. Pacos serviced it with new tires, sealant and a rim strip, and it's running great. We may swap the stem for a better fit (TBD). This makes the trip much easier: no worrying about rental availability, no return deadline in Fruita, and a lot less cost.</p>
+    <p>Rental info is kept below in case we need a backup.</p>
+    <p>Class 1 e-bikes aren't allowed everywhere. Each ride card below shows its status, and the plan only uses trails where a Class 1 is allowed.</p>
+  </div>
+  <div class="layers">
+    <div class="layer"><span class="eb yes">Class 1 OK</span><h3>Allowed</h3><ul><li>18 Road / North Fruita Desert (BLM, since 2022)</li><li>Navajo Rocks, Moab Brands (Bar M), and Raptor Route's Hawks Glide, Falcon Flow and Kestrel Run (Moab BLM, since March 2026)</li><li>Slickrock (a motorized route)</li><li>Dead Horse Point (state park, Class 1)</li></ul></div>
+    <div class="layer"><span class="eb no">No e-bikes</span><h3>Closed</h3><ul><li>Lunch Loops, Grand Junction</li><li>Eagle Eye, the first section of Raptor Route</li><li>Porcupine Rim Singletrack and LPS</li><li>Kokopelli Loops (Mary's, Horsethief, Moore Fun, Hawkeye), per <a href="https://www.otefruita.com/articles/trail-conditions-guides-pg195.htm" target="_blank" rel="noopener">Over The Edge</a> in Fruita. Officially closed, but see the gray-area note below</li></ul></div>
+    <div class="layer"><span class="eb check">Gray area</span><h3>Kokopelli in practice</h3><ul><li>David called Kris at Over The Edge (970-858-7220) on Oct 16, 2026</li><li>Kris confirmed that Kokopelli is technically closed to e-bikes</li><li>People do ride e-bikes there, and the shop rents e-bikes for it</li><li>His view: a gray area that is fine as long as riders don't abuse the privilege</li><li>It is still BLM land with a closure in place, so a ranger could write a ticket</li></ul></div>
+    <div class="layer"><span class="tag">Sorted</span><h3>Adam's bike: borrowed Levo</h3><ul><li>Specialized Levo Gen 3, borrowed from Scott, a close friend. Running great</li><li>Serviced at Pacos, the local Specialized shop: new front and rear tires, fresh sealant, a new rim strip on one wheel, and functionally tested</li><li>Size medium; saddle height checked with the post extended, and it's high enough for Adam</li><li>Stem swap for fit: TBD</li><li>Bring its charger</li></ul></div>
+    <div class="layer"><span class="eb check">Backup only</span><h3>If we need to rent</h3><ul><li><a href="https://www.otefruita.com/" target="_blank" rel="noopener">Over The Edge</a>, Fruita: 970-858-7220 (ask for Kris)</li><li>E-bikes run $140–170 a day, with no multi-day discount; over $700 plus tax for five days</li><li>A five-day Fruita rental has to be back by 5 pm Wednesday, which means leaving Moab by 3 pm that day</li><li>Separate rentals in Fruita and Moab would avoid that deadline</li></ul></div>
+    <div class="layer"><span class="eb check">Check first</span><h3>Unconfirmed</h3><ul><li>Mag 7's Getaway and Bull Run aren't on Moab BLM's open list.</li></ul></div>
+  </div>
+</section>
+
+<section id="list">
+  <div class="eyebrow">The trip in numbers</div>
+  <h2>The ride list</h2>
+  <div class="facts" id="facts"></div>
+  <div class="layers">
+    <div class="layer"><span class="tag">Adam's spreadsheet · 7</span><h3>Original rides from Adam</h3><ul><li>Raptor Route</li><li>Porcupine Rim</li><li>Mag 7 + Getaway + Bull Run</li><li>Zippity Do Dah</li><li>Ultimate flow at 18 Road</li><li>13 Mile Kokopelli Loop</li><li>Best of Kokopelli (minus double blacks)</li></ul></div>
+    <div class="layer"><span class="tag new">Added · 6</span><h3>Added to Adam's spreadsheet</h3><ul><li>Slickrock</li><li>Navajo Rocks Loop</li><li>Dead Horse Point Loop (Intrepid)</li><li>Bar M Loop</li><li>18 Road Combo</li><li>Lunch Loops</li></ul></div>
+  </div>
+  <p class="prose" style="color:var(--muted);font-size:0.92rem">Totals add up every ride on the list. The day plan below rides seven of them, since several overlap on the same trails. Lunch Loops has no published descent figure, so it isn't in the descent total.</p>
+</section>
+
+<section id="trails">
+  <div class="eyebrow">Rides</div>
+  <h2>Where we're riding</h2>
+  <div class="legend">
+    <span class="diff easy"><i>●</i>Easy</span>
+    <span class="diff moderate"><i>■</i>Moderate</span>
+    <span class="diff hard"><i>◆</i>Hard</span>
+    <span class="diff expert"><i>◆◆</i>Expert</span>
+  </div>
+  <div class="filters" role="group" aria-label="Filter rides by town">
+    <button type="button" id="f-all" data-f="all" aria-pressed="true">All rides</button>
+    <button type="button" id="f-fruita" data-f="fruita" aria-pressed="false">Fruita &amp; Grand Junction</button>
+    <button type="button" id="f-moab" data-f="moab" aria-pressed="false">Moab</button>
+  </div>
+  <div id="rides" style="display:grid;gap:22px"></div>
+</section>
+
+<section id="closed">
+  <div class="eyebrow">Advice from Claude, the planning assistant</div>
+  <h2>E-bikes on closed trails</h2>
+  <div class="prose">
+    <p>Several Fruita shops have said it's fine to ride a low-powered Class 1 e-bike on trails that are closed to e-bikes, as long as we're respectful. The reasoning makes sense: a Levo SL at 70% assist rides much like a fit rider on an acoustic bike, and fit acoustic riders are often faster. That gap is a big part of why Class 1 is the class land managers are opening trails to.</p>
+    <p>Here's the concern.</p>
+  </div>
+  <div class="layers">
+    <div class="layer"><span class="eb no">Rule</span><h3>Shops can't give permission</h3><ul><li>On BLM land, a closure to e-bikes is a federal rule, and rangers can write tickets.</li><li>"A shop said it was fine" won't help if we're stopped.</li><li>Moab's trail signs now carry stickers marking which trails allow e-bikes, so the closures are visible and easy to enforce.</li></ul></div>
+    <div class="layer"><span class="eb check">Access</span><h3>The closures were chosen deliberately</h3><ul><li>Moab BLM opened about 200 miles to Class 1 e-bikes in March 2026 and deliberately left out a few trails, including Eagle Eye, Porcupine Rim Singletrack and LPS.</li><li>Grand Junction kept Lunch Loops closed in the same round.</li><li>More access depends on showing that the current rules hold up.</li></ul></div>
+    <div class="layer"><span class="eb yes">Cost</span><h3>The legal plan barely loses anything</h3><ul><li>Raptor Route: start at Hawks Glide instead of Eagle Eye.</li><li>Lunch Loops: 18 Road covers the same kind of riding, and it allows e-bikes.</li><li>Kokopelli: officially closed to e-bikes, so the third riding day moves to Moab, which has more open trails. Over The Edge says riders use e-bikes there anyway (a gray area); that is our call to make.</li></ul></div>
+  </div>
+  <div class="prose">
+    <p><b>My advice:</b> ride the plan as written. It only uses trails open to Class 1 e-bikes, and it still covers the best riding in both towns. For any trail that's still closed, the decision is yours to make on the day, knowing the risk. This page is a shared plan, so it sticks to what's allowed.</p>
+  </div>
+</section>
+
+<section id="plan">
+  <div class="eyebrow">Day by day · Oct 23–28</div>
+  <h2>What we rode</h2>
+  <p class="prose">Each day shows what we actually rode, with the original plan crossed out underneath. Stats come from David's Strava; the bar under each day shows climbing against the Levo SL's roughly 4,000 ft range. Every ride stuck to trails open to Class 1 e-bikes, apart from the Kokopelli gray area on Saturday.</p>
+  <div class="facts">
+    <div class="fact"><b>5</b><span>riding days</span></div>
+    <div class="fact"><b>102.9</b><span>miles ridden</span></div>
+    <div class="fact"><b>11,464</b><span>feet of climbing on Strava, about 3,000 of it on Tuesday's shuttle</span></div>
+    <div class="fact"><b>12 h 1 m</b><span>riding time</span></div>
+    <div class="fact"><b>+1</b><span>sunset hike to Delicate Arch</span></div>
+  </div>
+  <div class="callout" id="conditions"><p><b>Fruita trail conditions:</b> check the <a href="https://www.otefruita.com/articles/trail-conditions-guides-pg195.htm" target="_blank" rel="noopener">Over The Edge daily trail report</a> the night before or first thing each morning before riding 18 Road or Kokopelli. It's updated as conditions change, so there's no need to call the shop. Wet desert clay ruts badly; if a trail isn't ready, don't ride it.</p><p style="margin-top:8px"><b>Fri Oct 23 report:</b> significant rain over the last 36 hours. Kokopelli may ride well this afternoon; 18 Road and Lunch Loops need a few days to dry out. Check again tonight and Saturday morning.</p></div>
+  <div class="days">
+    <div class="slot travel"><span class="d">Fri 23</span><div><h3>Drove from Salt Lake City · picked up Adam in Grand Junction · late check-in at Balanced Rock Inn</h3><p>Adam flew in to Grand Junction that evening. No riding. Significant rain over the previous 36 hours set up the change of plans for Saturday.</p></div></div>
+    <div class="slot"><span class="d">Sat 24</span><div><h3>Ridden: Kokopelli Loops, “I ❤️ Fruita” · with Adam</h3><p class="ride-time">Actual: 19.79 mi · 2,280 ft of climbing · 2 h 26 min · started 11:38 am</p><p>18 Road was still too wet after the Oct 22–23 rain, so David and Adam rode the Kokopelli routes near Loma instead, the area the trail report said would dry out first. The route ran out along the Colorado River and back, with big views from the rim above the river. <a href="https://strava.app.link/xwDlfCoBC7b" target="_blank" rel="noopener">See it on Strava ↗</a></p><p><s>Planned: 18 Road, Ultimate Flow + Zippity Do Dah, about 20 mi and 2,300 ft.</s></p><div class="budget" style="--pct:57%"><span></span></div><p class="bnote">2,280 ft of climbing, 57% of range</p></div></div>
+    <div class="slot"><span class="d">Sun 25</span><div><h3>Ridden: 18 Road Combo, Chutes and Ladders + Zippity Do Dah · with Adam</h3><p class="ride-time">Actual: 18.37 mi · 2,043 ft of climbing · 2 h 24 min · started 11:57 am</p><p>Rain was still threatening. A brief downpour sent us off to lunch before heading back out to 18 Road. The start of the ride was muddy, but it was fine after that. Zippity Do Dah is crazy fun downhill, with big views of the Book Cliffs. <a href="https://strava.app.link/HqH1ANSBC7b" target="_blank" rel="noopener">See it on Strava ↗</a></p><p><s>Planned: 18 Road Combo, about 14.3 mi and 1,400 ft.</s></p><div class="budget" style="--pct:51%"><span></span></div><p class="bnote">2,043 ft of climbing, 51% of range</p></div></div>
+    <div class="slot travel"><span class="d">Mon 26</span><div><h3>Ridden: Moab, Klondike Bluffs · solo</h3><p class="ride-time">Actual: 16.43 mi · 1,654 ft of climbing · 2 h 18 min · started 2:22 pm</p><p>Adam flew home today, so David drove to Moab and rode solo. “Very technical riding here, my arms and shoulders said hello. Missing Adam today big time!” Rocky red-dirt singletrack and slickrock, with views out over the valley. <a href="https://strava.app.link/9Dj3nfeCC7b" target="_blank" rel="noopener">See it on Strava ↗</a></p><p><s>Planned: Navajo Rocks Loop, about 17.1 mi and 1,600 ft.</s></p><div class="budget" style="--pct:41%"><span></span></div><p class="bnote">1,654 ft of climbing, 41% of range</p></div></div>
+    <div class="slot"><span class="d">Tue 27</span><div><h3>Ridden: “Moab: Top 3 DH” · with John</h3><p class="ride-time">Actual: 34.60 mi · 4,351 ft of climbing · 3 h 8 min · 1 Strava achievement</p><p>The Moab Cyclery shuttle drove us about 3,000 ft up, roughly three-quarters of the way. We climbed the rest to the top, then turned around and descended the way we came to skip the top singletrack, which is closed to e-bikes and carries a $5,000 fine and bike confiscation. Then the long descent back to town: one of David's top 3 downhill runs of all time. Technical, with warning signs to dismount on the crazy stuff; firm dirt; epic views in every direction, with the snowy La Sals behind the slickrock. “The scale of this place is like no other, freaking amazing!” Strava: 9th on the “Stop sign to FS boundary” segment. <a href="https://strava.app.link/wp2eMfDCC7b" target="_blank" rel="noopener">See it on Strava ↗</a></p><p>Near the bottom we added the Slickrock trails: very strange riding, steep, and the sandstone gripped in a way David didn't think was possible.</p><p>Because the shuttle did most of the climbing, we still had time and legs to hike in Arches National Park later that day.</p><p><b>Afternoon sunset hike: Delicate Arch</b> · with John · 2.92 mi · 686 ft of climbing · 1 h 2 min. Delicate Arch in late light, with the snowy La Sals framed through it. “Ok, hikes like this make me ❤️ hiking. Need to rethink always biking, thanks JC!” <a href="https://strava.app.link/AWmRFrWCC7b" target="_blank" rel="noopener">See it on Strava ↗</a></p><p><s>Planned: partial Raptor Route from Hawks Glide + Slickrock Practice Loop, about 800 ft of climbing.</s></p><div class="budget" style="--pct:34%"><span></span></div><p class="bnote">Strava's 4,351 ft includes about 3,000 ft on the shuttle, so roughly 1,350 ft was pedaled: about 34% of range</p></div></div>
+    <div class="slot travel"><span class="d">Wed 28</span><div><h3>Ridden: “Moab: party over 😕”, Bar M trails · with John</h3><p class="ride-time">Actual: 13.73 mi · 1,136 ft of climbing · 1 h 45 min · started 10:28 am</p><p>The last ride of the trip, at Moab Brands. A surprisingly physical challenge, with a long, techy slickrock section: some chunky stretches and some nice flowy singletrack. Afterwards John drove east and David drove west, home to Truckee. “Putting away bike soon with snow expected next week?” <a href="https://strava.app.link/OpcQXE1CC7b" target="_blank" rel="noopener">See it on Strava ↗</a></p><p><s>Planned: Moab Brands loop, about 12–15 mi and 700 ft, then the drive to Grand Junction.</s></p><div class="budget" style="--pct:28%"><span></span></div><p class="bnote">1,136 ft of climbing, 28% of range</p></div></div>
+  </div>
+</section>
+
+<section id="logistics">
+  <div class="eyebrow">How it was arranged</div>
+  <h2>Logistics</h2>
+  <div class="layers">
+    <div class="layer" id="lodging"><span class="tag">Stayed</span><h3>Fruita lodging</h3><ul><li><a href="https://www.balancedrockinn.com/" target="_blank" rel="noopener">Balanced Rock Inn</a>, 126 S. Coulson St, Fruita</li><li>Nights of Oct 23, 24 and 25</li><li>Has a bike wash and tool station</li></ul></div>
+    <div class="layer"><span class="tag">Stayed</span><h3>Moab lodging</h3><ul><li><a href="https://gravityhaus.com/" target="_blank" rel="noopener">Gravity Haus Moab</a>, two queens</li><li>Nights of Oct 26 and 27 (check out Wed 28)</li><li>David stayed on after Adam's plans changed</li></ul></div>
+    <div class="layer"><span class="eb check">Cancelled</span><h3>Grand Junction lodging</h3><ul><li><s>Courtyard by Marriott Grand Junction, night of Oct 28</s></li><li>Cancelled at no fee once Adam's return moved to Monday</li><li>David drove home from Moab on Wed Oct 28 instead</li></ul></div>
+    <div class="layer" id="shuttle"><span class="tag">Ridden</span><h3>Raptor Route shuttle</h3><ul><li><b>Used by David and John on Tue Oct 27.</b> It drove us about 3,000 ft up</li><li><a href="https://moabcyclery.com/shuttles/" target="_blank" rel="noopener">Moab Cyclery</a>, <b>Tue Oct 27, 10:30 am</b> Meet at the shop, <b>391 S Main St, Moab</b>, a 2-minute ride from Gravity Haus</li><li>E-bike shuttle to the Hawk's Glide drop: about $50 per rider, plus tax and a tip for the drivers</li><li>Backup if plans change: <a href="https://wholeenchiladashuttles.com/shuttle-info-and-rates/" target="_blank" rel="noopener">Whole Enchilada Shuttles</a>, run with <a href="https://poisonspiderbicycles.com/bike-shuttles/" target="_blank" rel="noopener">Poison Spider Bicycles</a>. Leaves at 10:00 am, same price, about a 10-minute ride from the hotel. Good ride info on their site</li><li>Poison Spider Bicycles: 497 N. Main St, Moab · <a href="tel:+14352597882">435-259-7882</a> (435-259-BIKE). Whole Enchilada Shuttle: <a href="tel:+14352602534">435-260-2534</a>, from trail listings, not their own site; confirm when calling</li></ul></div>
+    <div class="layer" id="playlist"><span class="tag">Drive</span><h3>Podcasts for the drive</h3><ul><li>David's long drive from Truckee to Grand Junction, and back</li><li><a href="https://deuber.github.io/drive-playlist/" target="_blank" rel="noopener">Drive Playlist</a>: nine podcast episodes, about 14 hours, in listening order</li><li>Download the episodes in Spotify before leaving; there are long stretches without cell service. The page lists backup sources too</li></ul></div>
+    <div class="layer"><span class="tag">Pay</span><h3>Fees and passes</h3><ul><li>Sand Flats Recreation Area day fee (Slickrock, Porcupine, Raptor)</li><li>Dead Horse Point State Park entry, if riding Intrepid</li></ul></div>
+    <div class="layer"><span class="tag">Carry</span><h3>On the bike</h3><ul><li>At least 3 L of water on longer days</li><li>Spare tube, plug kit, pump, multi-tool</li><li>Layers: late-October mornings start cold</li><li>David: Levo SL charger and both range extenders, charged each night</li><li>Adam: the Levo's charger, plus a stem if we swap it</li>
+<li>Sun protection; shade is rare</li><li>Offline Trailforks maps</li></ul></div>
+    <div class="layer"><span class="tag shuttle">Check</span><h3>Conditions</h3><ul><li>Fruita: the <a href="https://www.otefruita.com/articles/trail-conditions-guides-pg195.htm" target="_blank" rel="noopener">Over The Edge daily trail report</a>, the night before or early morning. No need to call the shop</li><li>Moab: Trailforks reports the day before each ride</li><li>Skip trails after rain; desert clay ruts badly when wet</li><li>Stay on trail to protect cryptobiotic soil</li></ul></div>
+  </div>
+</section>
+
+<footer id="sources">
+  <p>Trip page. Seven rides come from Adam's original spreadsheet (Fruita_Moab 2026) and are tagged "From Adam's spreadsheet". The six tagged "Added · not in Adam's spreadsheet" were added later, with stats from their Trailforks pages; check those figures before riding. Rides with extreme exposure were left off on purpose.</p>
+  <ul>
+    <li><a href="https://www.trailforks.com/region/18-road/">18 Road on Trailforks</a></li>
+    <li><a href="https://www.trailforks.com/region/kokopelli-loops/">Kokopelli Loops on Trailforks</a></li>
+    <li><a href="https://www.trailforks.com/region/lunch-loops/">Lunch Loops on Trailforks</a></li>
+    <li><a href="https://www.trailforks.com/region/moab/">Moab on Trailforks</a></li>
+    <li><a href="https://www.blm.gov/e-bikes-moab-field-office">E-Bikes, BLM Moab Field Office</a>: Class 1 open and closed trails (March 2026)</li>
+    <li><a href="https://www.moabtimes.com/articles/moab-area-trails-open-to-class-1-e-bikes-on-about-190-miles-of-singletrack/">Moab-area trails open to Class 1 e-bikes</a>, Moab Times-Independent (March 2026)</li>
+    <li><a href="https://www.gjsentinel.com/news/e-bike-use-of-north-fruita-desert-trails-working-well-so-far-blm-reports/article_287f2e32-3b91-11ed-8e46-5319e4181424.html">E-bike use of North Fruita Desert trails</a>, Grand Junction Daily Sentinel (2022)</li>
+    <li><a href="https://www.otefruita.com/articles/trail-conditions-guides-pg195.htm">Trail Conditions &amp; Guides</a>, Over The Edge Fruita: no e-bikes at Kokopelli</li>
+    <li><a href="https://moabcyclery.com/shuttles/">Moab Cyclery shuttles</a></li>
+    <li><a href="https://poisonspiderbicycles.com/">Poison Spider Bicycles</a>, Moab: shop address and phone, and link to Whole Enchilada Shuttles</li>
+    <li><a href="https://www.utah.com/things-to-do/outdoor-recreation/mountain-biking/the-whole-enchilada-trail/">The Whole Enchilada Trail</a>, Utah.com: Whole Enchilada Shuttle phone</li>
+    <li><a href="https://wholeenchiladashuttles.com/shuttle-info-and-rates/">Whole Enchilada Shuttles: shuttle info and rates</a>: the 6.5 mi ride back from Kestrel Run via Sand Flats Rd</li>
+    <li><a href="https://coloradosun.com/2026/03/24/blm-ebikes-moab-colorado/">BLM e-bikes in Moab and Colorado</a>, Colorado Sun (March 2026): Lunch Loops stays closed to e-bikes</li>
+  </ul>
+</footer>
+
+</div>
+
+<script>
+const TF = "https://www.trailforks.com/";
+const OTE = "https://www.otefruita.com/articles/trail-conditions-guides-pg195.htm";
+const RIDES = [
+  { name: "Raptor Route", eb: "check", ebText: "Eagle Eye: no e-bikes. Hawks Glide, Falcon Flow, Kestrel Run: Class 1 OK", town: "moab", area: "Moab · Sand Flats", mi: 11, diff: "Moderate", up: 436, down: 2926, rating: 5, shuttle: true,
+    note: "Eagle Eye, Hawks Glide, Falcon Flow and Kestrel Run. An excellent downhill route on its own, or as the finish off the Whole Enchilada.",
+    caution: "With e-bikes, start at Hawks Glide. Moab Cyclery shuttles e-bikes to that drop-off ($50 each). Booked for Tue Oct 27 at 10:30 am, riding back to town past Slickrock.",
+    url: TF + "trails/eagle-eye-345558/", linkText: "Eagle Eye on Trailforks" },
+  { name: "Porcupine Rim", eb: "no", ebText: "No e-bikes", town: "moab", area: "Moab · Sand Flats", mi: 11.3, diff: "Expert", up: 200, down: 3000, rating: 5, shuttle: true,
+    note: "One of Moab's must-ride trails. A long pedal up from town, but best shuttled to the top. Expert descent down to the river.",
+    caution: "Exposure along the rim on the lower half. Not in this trip's plan.",
+    url: TF + "trails/porcupine-rim/", linkText: "Porcupine Rim on Trailforks" },
+  { name: "Mag 7 + Getaway + Bull Run", eb: "check", ebText: "E-bikes: check first", town: "moab", area: "Moab · Mag 7", mi: 18.2, diff: "Moderate", up: 1410, down: 1430, rating: 4,
+    note: "Loops some of the most scenic sections of Mag 7 while limiting the climbing. Ride up Getaway and back down Bull Run.",
+    url: TF + "route/mag-7-getaway--bull-run/", linkText: "Mag 7 + Getaway + Bull Run route" },
+  { name: "Slickrock", eb: "yes", ebText: "Class 1 OK", town: "moab", area: "Moab · Sand Flats", mi: 8.9, diff: "Hard", up: 837, down: 836, added: true,
+    note: "The iconic petrified-sandstone loop. Steep, punchy climbing on rock; more tech and effort than flow.",
+    caution: "Adam suggests the Practice Loop: shorter, less committing, and a good taste of the rock.",
+    url: TF + "route/slickrock/", linkText: "Slickrock route" },
+  { name: "Navajo Rocks Loop", eb: "yes", ebText: "Class 1 OK", town: "moab", area: "Moab · Navajo Rocks", mi: 17.1, diff: "Moderate", up: 1571, down: 1564, added: true,
+    note: "Intermediate mix of dirt and slickrock north of town. A good warm-up or first-day ride.",
+    url: TF + "route/navajo-rocks-loop-3833/", linkText: "Navajo Rocks Loop route" },
+  { name: "Dead Horse Point Loop (Intrepid)", eb: "yes", ebText: "Class 1 OK", town: "moab", area: "Moab · Dead Horse Point", mi: 8.2, diff: "Easy", up: 480, down: 484, added: true,
+    note: "Intrepid, Great Pyramid, Big Chief and Raven Roll. Easy, very scenic canyon-rim riding for a recovery day. State park fee.",
+    url: TF + "route/dead-horse-route", linkText: "Dead Horse route" },
+  { name: "Bar M Loop", eb: "yes", ebText: "Class 1 OK", town: "moab", area: "Moab · Moab Brands", mi: 6.6, diff: "Easy", up: 278, down: 303, added: true,
+    note: "Quick, easy laps just north of town; ride it counter-clockwise. Add Lazy/EZ or Rockin' A for more flow.",
+    url: TF + "trails/bar-m-loop/", linkText: "Bar M Loop on Trailforks" },
+  { name: "Zippity Do Dah", eb: "yes", ebText: "Class 1 OK", town: "fruita", area: "Fruita · 18 Road", mi: 2.2, diff: "Expert", up: 136, down: 535, rating: 5,
+    note: "One of the iconic 18 Road trails. Endless undulating singletrack along the tops of little hills. Mostly fast and down; a must when here.",
+    url: TF + "trails/18-road-307464/", linkText: "18 Road on Trailforks" },
+  { name: "Ultimate flow at 18 Road", eb: "yes", ebText: "Class 1 OK", town: "fruita", area: "Fruita · 18 Road", mi: 17.9, diff: "Moderate", up: 2188, down: 2205, rating: 5,
+    note: "All the great downhill runs with minimal effort up. Road climb to warm up, Kessel Run to warm up skills, then Prime Cut up to PBR for fast flow.",
+    url: TF + "trails/prime-cut/", linkText: "Prime Cut on Trailforks" },
+  { name: "18 Road Combo", eb: "yes", ebText: "Class 1 OK", town: "fruita", area: "Fruita · 18 Road", mi: 14.3, diff: "Moderate", up: 1391, down: 1383, added: true,
+    note: "Links Zippity Do Dah and Chutes and Ladders with other Book Cliffs ridgeline trails. Rollercoaster fun.",
+    url: TF + "route/18-road-combo/", linkText: "18 Road Combo route" },
+  { name: "13 Mile Kokopelli Loop", eb: "check", ebText: "Officially closed to e-bikes · gray area per Over The Edge", town: "fruita", area: "Fruita · Kokopelli Loops", mi: 12.6, diff: "Moderate", up: 1745, down: 1744, rating: 4,
+    note: "The Kokopelli network has a bit of everything from slow tech to fast flow. This is the shorter loop.",
+    url: TF + "region/kokopelli-loops/", linkText: "Kokopelli Loops on Trailforks" },
+  { name: "Best of Kokopelli (minus double blacks)", eb: "check", ebText: "Officially closed to e-bikes · gray area per Over The Edge", town: "fruita", area: "Fruita · Kokopelli Loops", mi: 20.7, diff: "Hard", up: 2190, down: 2180,
+    note: "Links the can't-miss trails, starting with Moore Fun, the most technical, and finishing on the newer Hawkeye trail for some traditional downhill.",
+    caution: "Walk the Horsethief Bench drop-in.",
+    url: TF + "route/the-best-of-kokopelli-trail-system-minus-double-blacks", linkText: "Best of Kokopelli route" },
+  { name: "Lunch Loops", eb: "no", ebText: "No e-bikes", town: "fruita", area: "Grand Junction · Lunch Loops", mi: 14, diff: "Expert", up: 1937, down: null, added: true,
+    note: "Rocky, technical Grand Junction network. Includes Free Lunch (double black, multiple drops) and Andy's Loop.",
+    caution: "Skip Free Lunch and the other double-black drop lines.",
+    url: TF + "route/lunch-loops/", linkText: "Lunch Loops route" },
+];
+const MARK = { Easy: "●", Moderate: "■", Hard: "◆", Expert: "◆◆" };
+const fmt = n => n.toLocaleString("en-US");
+const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+function renderFacts() {
+  const mi = RIDES.reduce((a, r) => a + r.mi, 0);
+  const up = RIDES.reduce((a, r) => a + r.up, 0);
+  const down = RIDES.reduce((a, r) => a + (r.down || 0), 0);
+  const items = [
+    [RIDES.length, "rides on the list"],
+    [Math.round(mi * 10) / 10, "miles in total"],
+    [fmt(up), "feet of climbing"],
+    [fmt(down), "feet of descent"],
+    [2, "base towns"],
+  ];
+  document.getElementById("facts").innerHTML = items.map(([b, s]) => `<div class="fact"><b>${b}</b><span>${s}</span></div>`).join("");
+}
+
+function card(r) {
+  const cls = r.diff.toLowerCase();
+  const tags = [
+    r.shuttle ? '<span class="tag shuttle">Shuttle</span>' : "",
+    r.added ? `<span class="tag new">Added · not in Adam's spreadsheet</span>` : `<span class="tag">From Adam's spreadsheet</span>`,
+  ].join("");
+  const rating = r.rating ? `<span>Rating <b>${r.rating}/5</b></span>` : "";
+  return `<article class="ride">
+    <div class="head">
+      <h4>${esc(r.name)}</h4>
+      <div class="badges"><span class="diff ${cls}"><i>${MARK[r.diff]}</i>${r.diff}</span>${tags}</div>
+      <span class="eb ${r.eb}">${esc(r.ebText)}</span>
+    </div>
+    <div class="body">
+      <div class="stats">
+        <span><b>${r.mi}</b> mi</span>
+        <span>↑ <b>${fmt(r.up)}</b> ft</span>
+        <span>↓ <b>${r.down == null ? "n/a" : fmt(r.down)}</b>${r.down == null ? "" : " ft"}</span>
+        ${rating}
+      </div>
+      <p class="note">${esc(r.note)}</p>
+      ${r.caution ? `<p class="caution">${esc(r.caution)}</p>` : ""}
+      ${r.town === "fruita" ? `<a class="link" href="${OTE}" target="_blank" rel="noopener">Check Over The Edge trail conditions before riding ↗</a>` : ""}
+      <a class="link" href="${r.url}" target="_blank" rel="noopener">${esc(r.linkText)} ↗</a>
+    </div>
+  </article>`;
+}
+
+function renderRides(filter) {
+  const groups = {};
+  RIDES.filter(r => filter === "all" || r.town === filter).forEach(r => (groups[r.area] ||= []).push(r));
+  const order = Object.keys(groups).sort((a, b) => (a.startsWith("Moab") - b.startsWith("Moab")) || a.localeCompare(b));
+  document.getElementById("rides").innerHTML = order.map(area =>
+    `<div class="area"><h3>${esc(area)}</h3>${groups[area].map(card).join("")}</div>`).join("");
+}
+
+document.querySelectorAll(".filters button").forEach(btn => btn.addEventListener("click", () => {
+  document.querySelectorAll(".filters button").forEach(b => b.setAttribute("aria-pressed", String(b === btn)));
+  renderRides(btn.dataset.f);
+  try { localStorage.setItem("ride-filter", btn.dataset.f); } catch (e) {}
+}));
+
+renderFacts();
+let saved = "all";
+try { saved = localStorage.getItem("ride-filter") || "all"; } catch (e) {}
+const start = document.querySelector(`.filters button[data-f="${saved}"]`) || document.getElementById("f-all");
+document.querySelectorAll(".filters button").forEach(b => b.setAttribute("aria-pressed", String(b === start)));
+renderRides(start.dataset.f);
+</script>
+</body>
+</html>
