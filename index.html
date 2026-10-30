@@ -72,6 +72,8 @@ header { display: grid; gap: 20px; padding-bottom: 40px; }
 .money tr:last-child td { border-bottom: 0; }
 .prose { max-width: 680px; display: grid; gap: 12px; }
 .meta { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--mono); font-size: 0.85rem; color: var(--muted); }
+.album { justify-self: start; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border: 1px solid var(--accent); border-radius: 6px; font-weight: 600; text-decoration: none; }
+.album:hover { background: var(--accent-soft); }
 .callout { border-left: 3px solid var(--flag); padding: 4px 0 4px 18px; max-width: 680px; }
 
 /* Trip figures */
@@ -156,10 +158,12 @@ footer ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }
     <span>Fri Oct 23 – Wed Oct 28, 2026</span>
     <span>Grand Junction → Fruita → Moab → home</span>
   </div>
+  <a class="album" id="photos" href="https://photos.google.com/album/AF1QipPSUNWZAvMC14RE-5hzpt_c3ETmdYtUuxe4RVlO" target="_blank" rel="noopener">📷 See the trip photo album ↗</a>
 </header>
 
 <nav class="toc" aria-label="Contents">
   <span class="eyebrow">Jump to</span>
+  <a href="#photos">Photos</a>
   <a href="#plan">What we rode</a>
   <a href="#next">Next year</a>
   <a href="#conditions">Conditions</a>
